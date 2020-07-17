@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -24,6 +25,17 @@ type Question struct {
 	Season      string `json:"season"`
 	QuestionNum string `json:"question_num"`
 	Genre       string `json:"genre"`
+}
+
+type QuestionSend struct {
+	QuestionID  uint     `json:"question_id"`
+	Question    string   `json:"question"`
+	QimgPath    []string `json:"qimg_path"`
+	AnsList     []string `json:"ans_list"`
+	AimgList    []string `json:"aimg_list"`
+	Season      string   `json:"season"`
+	QuestionNum string   `json:"question_num"`
+	Genre       string   `json:"genre"`
 }
 
 func sqlConnect() (database *gorm.DB) {
@@ -63,7 +75,6 @@ func strToIntList(str string) []int {
 	intList := []int{}
 	str = strings.Trim(str, "[]")
 	strList := strings.Split(str, ",")
-	fmt.Println(strList)
 	if str != "" {
 		for i := 0; i < len(strList); i++ {
 			n, _ := strconv.Atoi(strList[i])
@@ -73,10 +84,10 @@ func strToIntList(str string) []int {
 	return intList
 }
 
-// func shuffle(a []string) {
-// 	rand.Seed(time.Now().UnixNano())
-// 	for i := range a {
-// 		j := rand.Intn(i + 1)
-// 		a[i], a[j] = a[j], a[i]
-// 	}
-// }
+func shuffle(a []string) {
+	rand.Seed(time.Now().UnixNano())
+	for i := range a {
+		j := rand.Intn(i + 1)
+		a[i], a[j] = a[j], a[i]
+	}
+}
