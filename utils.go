@@ -52,6 +52,7 @@ func sqlConnect() (database *gorm.DB) {
 	return db
 }
 
+// intsにsearchがあったらそれを削除してリストを返す
 func remove(ints []int, search int) []int {
 	result := []int{}
 	for _, v := range ints {
@@ -62,6 +63,7 @@ func remove(ints []int, search int) []int {
 	return result
 }
 
+// intsの中にsearchがあったらtrueを返す
 func searchIDs(ints []int, search int) bool {
 	for _, v := range ints {
 		if v == search {
@@ -71,6 +73,7 @@ func searchIDs(ints []int, search int) bool {
 	return false
 }
 
+// string型で受け取った数値のリストをInt型のリストにして返す
 func strToIntList(str string) []int {
 	intList := []int{}
 	str = strings.Trim(str, "[]")
@@ -84,6 +87,7 @@ func strToIntList(str string) []int {
 	return intList
 }
 
+// string型のリストをバラバラの順番にして返す
 func shuffle(a []string) {
 	rand.Seed(time.Now().UnixNano())
 	for i := range a {
