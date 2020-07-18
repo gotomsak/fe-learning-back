@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 )
 
 func getQuestion(c echo.Context) error {
-	fmt.Println("nyan")
 	db := sqlConnect()
 	defer db.Close()
 	question := Question{}
