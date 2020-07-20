@@ -14,6 +14,7 @@ func router() *echo.Echo {
 	e.Use(middleware.CORS())
 	e.POST("/question_ids", getQuestionIds)
 	e.GET("/question", getQuestion)
+	e.POST("/signup", signup)
 	return e
 }
 

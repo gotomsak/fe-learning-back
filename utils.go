@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 func sqlConnect() (database *gorm.DB) {
@@ -16,8 +17,9 @@ func sqlConnect() (database *gorm.DB) {
 	PASS := os.Getenv("PASS")
 	PROTOCOL := os.Getenv("PROTOCOL")
 	DBNAME := os.Getenv("DBNAME")
-	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8&parseTime=true&loc=Asia%2FTokyo"
+	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 	db, err := gorm.Open(DBMS, CONNECT)
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{})
 	if err != nil {
 		panic(err.Error())
 	}

@@ -18,8 +18,11 @@ func getQuestionIds(c echo.Context) error {
 	firstId := int(questions.ID) - int(count) + 1
 
 	s_ids_str := c.FormValue("solved_ids")
+	q_ids_str := c.FormValue("question_ids")
 	new_question_list := []int{}
 	solve_list := strToIntList(s_ids_str)
+	question_list := strToIntList(q_ids_str)
+	solve_list = append(solve_list, question_list...)
 
 	for {
 		rand.Seed(time.Now().UnixNano())
