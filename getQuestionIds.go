@@ -8,11 +8,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-type GetQuestionIDs struct {
-	QuestionIDs []int `json:"question_ids"`
-	SolvedIDs   []int `json:"solved_ids"`
-}
-
 func getQuestionIds(c echo.Context) error {
 	db := sqlConnect()
 	defer db.Close()
