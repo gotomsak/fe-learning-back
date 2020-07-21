@@ -16,6 +16,12 @@ func signup(c echo.Context) error {
 	user.Username = c.FormValue("username")
 	user.PasswordDigest = hash
 	user.Email = c.FormValue("email")
+	if c.FormValue("test") == "true" {
+		tx := db.Begin()
+		error := tx.Create(&user).Error
+		tx.Rollback()
+		return error
+	}
 	error := db.Create(&user).Error
 	return error
 }
