@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/labstack/echo"
 
 	"golang.org/x/crypto/bcrypt"
 )
