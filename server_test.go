@@ -14,8 +14,6 @@ import (
 
 func TestGetQuestion(t *testing.T) {
 	envLoad()
-	db := sqlConnect()
-	tx := db.Begin()
 
 	e := router()
 	req := httptest.NewRequest("GET", "/question?id=6000", nil)
@@ -24,13 +22,10 @@ func TestGetQuestion(t *testing.T) {
 
 	e.ServeHTTP(rec, req)
 	log.Print(rec.Body)
-	tx.Rollback()
 }
 
 func TestGetQusetionIDs(t *testing.T) {
 	envLoad()
-	db := sqlConnect()
-	tx := db.Begin()
 	e := router()
 	values := url.Values{}
 	values.Set("solved_ids", "[]")
@@ -42,13 +37,10 @@ func TestGetQusetionIDs(t *testing.T) {
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
 	log.Print(rec.Body)
-	tx.Rollback()
 }
 
 func TestSignup(t *testing.T) {
 	envLoad()
-	db := sqlConnect()
-	tx := db.Begin()
 	e := router()
 
 	values := url.Values{}
@@ -56,6 +48,7 @@ func TestSignup(t *testing.T) {
 	values.Set("username", "hoge")
 	values.Set("password", "foobar")
 	values.Set("email", "example.com")
+	values.Set("test", "true")
 
 	body := strings.NewReader(values.Encode())
 
@@ -65,5 +58,4 @@ func TestSignup(t *testing.T) {
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
 	log.Print(rec.Body)
-	tx.Rollback()
 }
