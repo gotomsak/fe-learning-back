@@ -70,5 +70,5 @@ func TestSignin(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
-
+	log.Print(rec.HeaderMap)
 }
