@@ -15,6 +15,9 @@ func router() *echo.Echo {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
+
+	e.POST("/signin", signin)
 	e.POST("/question_ids", getQuestionIds)
 	e.GET("/question", getQuestion)
 	e.POST("/signup", signup)
