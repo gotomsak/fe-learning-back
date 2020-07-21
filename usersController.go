@@ -11,13 +11,11 @@ func signup(c echo.Context) error {
 	defer db.Close()
 	user := User{}
 
-	username := c.FormValue("username")
 	password := c.FormValue("password")
-	email := c.FormValue("email")
 	hash := passwordHash(password)
-	user.Username = string(username)
+	user.Username = c.FormValue("username")
 	user.PasswordDigest = hash
-	user.Email = string(email)
+	user.Email = c.FormValue("email")
 	error := db.Create(&user).Error
 	return error
 }
