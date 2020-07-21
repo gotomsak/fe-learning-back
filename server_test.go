@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -48,14 +47,27 @@ func TestSignup(t *testing.T) {
 	values.Set("username", "hoge")
 	values.Set("password", "foobar")
 	values.Set("email", "example.com")
-	values.Set("test", "true")
+	// values.Set("test", "true")
 
 	body := strings.NewReader(values.Encode())
-
-	fmt.Println(body)
 	req := httptest.NewRequest(http.MethodPost, "/signup", body)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
-	log.Print(rec.Body)
+}
+
+func TestSignin(t *testing.T) {
+	envLoad()
+	e := router()
+	values := url.Values{}
+
+	values.Set("password", "foobar")
+	values.Set("email", "example.com")
+	body := strings.NewReader(values.Encode())
+
+	req := httptest.NewRequest(http.MethodPost, "/signin", body)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+
 }
