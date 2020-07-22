@@ -15,32 +15,32 @@ func getQuestionIds(c echo.Context) error {
 	db.Last(&questions)
 	var count int
 	db.Table("questions").Count(&count)
-	firstId := int(questions.ID) - int(count) + 1
+	firstID := int(questions.ID) - int(count) + 1
 
-	s_ids_str := c.FormValue("solved_ids")
-	q_ids_str := c.FormValue("question_ids")
-	new_question_list := []int{}
-	solve_list := strToIntList(s_ids_str)
-	question_list := strToIntList(q_ids_str)
-	solve_list = append(solve_list, question_list...)
+	sIdsStr := c.FormValue("solved_ids")
+	qIdsStr := c.FormValue("question_ids")
+	newQuestionList := []int{}
+	solveList := strToIntList(sIdsStr)
+	questionList := strToIntList(qIdsStr)
+	solveList = append(solveList, questionList...)
 
 	for {
 		rand.Seed(time.Now().UnixNano())
 		random := rand.Intn(count)
-		if true == searchIDs(solve_list, random) {
+		if true == searchIDs(solveList, random) {
 			continue
 		}
-		if true == searchIDs(new_question_list, random) {
+		if true == searchIDs(newQuestionList, random) {
 			continue
 		}
-		new_question_list = append(new_question_list, firstId+random)
-		if len(new_question_list) == 10 {
+		newQuestionList = append(newQuestionList, firstID+random)
+		if len(newQuestionList) == 10 {
 			break
 		}
 	}
 	gqi := GetQuestionIDs{
-		QuestionIDs: new_question_list,
-		SolvedIDs:   solve_list,
+		QuestionIDs: newQuestionList,
+		SolvedIDs:   solveList,
 	}
 	return c.JSON(http.StatusOK, gqi)
 }

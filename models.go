@@ -2,11 +2,13 @@ package main
 
 import "github.com/jinzhu/gorm"
 
+// GetQuestionIDs 解く問題のIDと解いた問題のIDのstruct
 type GetQuestionIDs struct {
 	QuestionIDs []int `json:"question_ids"`
 	SolvedIDs   []int `json:"solved_ids"`
 }
 
+// Question questionテーブルのstruct
 type Question struct {
 	gorm.Model
 	Question    string `json:"question"`
@@ -24,6 +26,7 @@ type Question struct {
 	Genre       string `json:"genre"`
 }
 
+// QuestionSend クライアントに送信する問題のstruct
 type QuestionSend struct {
 	QuestionID  uint     `json:"question_id"`
 	Question    string   `json:"question"`
@@ -35,6 +38,7 @@ type QuestionSend struct {
 	Genre       string   `json:"genre"`
 }
 
+// User userテーブルのstruct
 type User struct {
 	gorm.Model
 	Username       string `json:"username"`
