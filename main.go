@@ -21,6 +21,7 @@ func router() *echo.Echo {
 	e.POST("/question_ids", getQuestionIds)
 	e.GET("/question", getQuestion)
 	e.POST("/signup", signup)
+	e.GET("/signout", signout)
 	return e
 }
 
