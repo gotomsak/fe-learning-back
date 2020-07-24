@@ -46,7 +46,11 @@ func signin(c echo.Context) error {
 			MaxAge:   86400 * 7,
 			HttpOnly: true,
 		}
-		sess.Save(c.Request(), c.Response())
+		sess.Values["authenticated"] = true
+		if err := sess.Save(c.Request(), c.Response()); err != nil {
+			return c.NoContent(http.StatusInternalServerError)
+		}
+
 		return c.NoContent(http.StatusOK)
 	}
 	return passcheck
