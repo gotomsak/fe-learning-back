@@ -52,6 +52,15 @@ func signin(c echo.Context) error {
 	return passcheck
 }
 
+func signout(c echo.Context) error {
+	sess, _ := session.Get("session", c)
+	sess.Options = &sessions.Options{MaxAge: -1, Path: "/"}
+	if err := sess.Save(c.Request(), c.Response()); err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+	return c.NoContent(http.StatusOK)
+}
+
 func passwordHash(pw string) string {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
 	if err != nil {
