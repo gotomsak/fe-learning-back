@@ -11,6 +11,8 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+var layout = "2006-01-02 15:04:05"
+
 func sqlConnect() (database *gorm.DB) {
 	DBMS := os.Getenv("DBMS")
 	USER := os.Getenv("USERR")
