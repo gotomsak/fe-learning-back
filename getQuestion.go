@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 	"regexp"
-	"strconv"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -22,8 +21,8 @@ func getQuestion(c echo.Context) error {
 	question := Question{}
 	questionSend := QuestionSend{}
 	questionID := c.QueryParam("id")
-	questionIDI, _ := strconv.Atoi(questionID)
-	db.First(&question, questionIDI)
+	uquestionID := stringToUint(questionID)
+	db.First(&question, uquestionID)
 	qimg := regexp.MustCompile(",").Split(question.QimgPath, -1)
 	ans := []string{question.Ans, question.Mistake1, question.Mistake2, question.Mistake3}
 	aimg := []string{question.AimgPath, question.MimgPath1, question.MimgPath2, question.MimgPath3}

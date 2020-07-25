@@ -40,7 +40,7 @@ func remove(ints []int, search int) []int {
 }
 
 // intsの中にsearchがあったらtrueを返す
-func searchIDs(ints []int, search int) bool {
+func searchIDs(ints []uint, search uint) bool {
 	for _, v := range ints {
 		if v == search {
 			return true
@@ -50,14 +50,15 @@ func searchIDs(ints []int, search int) bool {
 }
 
 // string型で受け取った数値のリストをInt型のリストにして返す
-func strToIntList(str string) []int {
-	intList := []int{}
+func strToUIntList(str string) []uint {
+	intList := []uint{}
 	str = strings.Trim(str, "[]")
 	strList := strings.Split(str, ",")
 	if str != "" {
 		for i := 0; i < len(strList); i++ {
-			n, _ := strconv.Atoi(strList[i])
-			intList = append(intList, n)
+			n, _ := strconv.ParseUint(strList[i], 10, 32)
+			un := uint(n)
+			intList = append(intList, un)
 		}
 	}
 	return intList
