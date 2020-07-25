@@ -69,3 +69,14 @@ func shuffle(a []string) {
 		a[i], a[j] = a[j], a[i]
 	}
 }
+
+func stringToTime(str string) time.Time {
+	t, _ := time.Parse(layout, str)
+	return t
+}
+
+func stringToUint(str string) uint {
+	Uint32, _ := strconv.ParseUint(str, 10, 32)
+	Uint := uint(Uint32)
+	return Uint
+}
