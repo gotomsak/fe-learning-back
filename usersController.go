@@ -26,8 +26,11 @@ func signup(c echo.Context) error {
 		tx.Rollback()
 		return error
 	}
-	error := db.Create(&user).Error
-	return error
+	err := db.Create(&user).Error
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, "ok")
 }
 
 func signin(c echo.Context) error {
