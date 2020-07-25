@@ -5,10 +5,18 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
 func getQuestion(c echo.Context) error {
+	sess, err := session.Get("session", c)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error")
+	}
+	if b, _ := sess.Values["authenticated"]; b != true {
+		return c.String(http.StatusUnauthorized, "401")
+	}
 	db := sqlConnect()
 	defer db.Close()
 	question := Question{}
