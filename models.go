@@ -1,11 +1,15 @@
 package main
 
-import "github.com/jinzhu/gorm"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
 
 // GetQuestionIDs 解く問題のIDと解いた問題のIDのstruct
 type GetQuestionIDs struct {
-	QuestionIDs []int `json:"question_ids"`
-	SolvedIDs   []int `json:"solved_ids"`
+	QuestionIDs []uint `json:"question_ids"`
+	SolvedIDs   []uint `json:"solved_ids"`
 }
 
 // Question questionテーブルのstruct
