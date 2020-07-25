@@ -49,3 +49,16 @@ type User struct {
 	Email          string `gorm:"type:varchar(100);unique_index"`
 	PasswordDigest string `json:"password_digest"`
 }
+
+// AnswerResult 解答の結果を保存するテーブルのstruct
+type AnswerResult struct {
+	gorm.Model
+	UserID           uint   `json:"user_id"`
+	UserAnswer       string `json:"user_answer"`   // userの選んだ答え
+	AnswerResult     string `json:"answer_result"` // correctかincorrect
+	MemoLog          string `json:"memo_log"`
+	StartTime        time.Time
+	EndTime          time.Time
+	OtherFocusSecond uint `json:"other_focus_second"`
+	QuestionID       uint `json:"question_id"`
+}
