@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/labstack/echo"
 )
@@ -80,6 +81,37 @@ func TestGetQusetionIDs(t *testing.T) {
 	body := strings.NewReader(values.Encode())
 	log.Print(body)
 	req := httptest.NewRequest("POST", "/question_ids", body)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+	req.Header.Add("Cookie", cookie.Name+"="+cookie.Value)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+	log.Print(rec.Body)
+}
+
+func TestCheckAnswer(t *testing.T) {
+	envLoad()
+	e := router()
+
+	nowTime := time.Now()
+	nowTimeString := nowTime.Format(layout)
+	log.Print(nowTimeString)
+	otherFocusSecond := "26"
+	questionID := "6000"
+	userID := "66"
+	memoLog := "wakaranai"
+	userAnswer := "ディスプレイに映像，文字などの情報を表示する電子看板"
+
+	values := url.Values{}
+	values.Set("start_time", nowTimeString)
+	values.Set("end_time", nowTimeString)
+	values.Set("other_focus_second", otherFocusSecond)
+	values.Set("question_id", questionID)
+	values.Set("user_id", userID)
+	values.Set("memo_log", memoLog)
+	values.Set("user_answer", userAnswer)
+	values.Set("test", "true")
+	body := strings.NewReader(values.Encode())
+	req := httptest.NewRequest("POST", "/check_answer", body)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 	req.Header.Add("Cookie", cookie.Name+"="+cookie.Value)
 	rec := httptest.NewRecorder()

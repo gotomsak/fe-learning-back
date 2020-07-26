@@ -22,6 +22,7 @@ func sqlConnect() (database *gorm.DB) {
 	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 	db, err := gorm.Open(DBMS, CONNECT)
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&AnswerResult{})
 	if err != nil {
 		panic(err.Error())
 	}

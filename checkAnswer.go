@@ -44,6 +44,17 @@ func checkAnswer(c echo.Context) error {
 		result = "correct"
 	}
 	answerResult.AnswerResult = result
+
+	if c.FormValue("test") == "true" {
+		tx := db.Begin()
+		err = tx.Create(&answerResult).Error
+		tx.Rollback()
+		if err != nil {
+			return c.NoContent(http.StatusInternalServerError)
+		}
+		return c.JSON(http.StatusOK, result)
+	}
+
 	err = db.Create(&answerResult).Error
 
 	if err != nil {
