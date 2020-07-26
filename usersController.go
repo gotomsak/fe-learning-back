@@ -22,9 +22,12 @@ func signup(c echo.Context) error {
 	user.Email = c.FormValue("email")
 	if c.FormValue("test") == "true" {
 		tx := db.Begin()
-		error := tx.Create(&user).Error
+		err := tx.Create(&user).Error
 		tx.Rollback()
-		return error
+		if err != nil {
+			return c.NoContent(http.StatusInternalServerError)
+		}
+		return c.JSON(http.StatusOK, "testok")
 	}
 	err := db.Create(&user).Error
 	if err != nil {
