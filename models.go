@@ -53,12 +53,24 @@ type User struct {
 // AnswerResult 解答の結果を保存するテーブルのstruct
 type AnswerResult struct {
 	gorm.Model
-	UserID           uint   `json:"user_id"`
-	UserAnswer       string `json:"user_answer"`   // userの選んだ答え
-	AnswerResult     string `json:"answer_result"` // correctかincorrect
-	MemoLog          string `json:"memo_log"`
+	UserID           uint   `gorm:"not null"`
+	UserAnswer       string `gorm:"not null"` // userの選んだ答え
+	AnswerResult     string `gorm:"not null"` // correctかincorrect
+	MemoLog          string `gorm:"type:text;"`
+	OtherFocusSecond uint   `json:"other_focus_second"`
+	QuestionID       uint   `gorm:"not null"`
 	StartTime        time.Time
 	EndTime          time.Time
-	OtherFocusSecond uint `json:"other_focus_second"`
-	QuestionID       uint `json:"question_id"`
+}
+
+// AnswerResultSection 解答の結果のまとめを保存するテーブルのstruct
+type AnswerResultSection struct {
+	gorm.Model
+	UserID              uint   `gorm:"not null"`
+	AnswerResultIDs     string `gorm:"type:text;not null"`
+	CorrectAnswerNumber uint   `gorm:"not null"`
+	OtherFocusSecond    uint   `json:"other_focus_second"`
+	FaceVideoPath       string `gorm:"type:varchar(255);unique_index"`
+	StartTime           time.Time
+	EndTime             time.Time
 }

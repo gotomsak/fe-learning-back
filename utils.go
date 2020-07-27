@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"math/rand"
 	"os"
 	"strconv"
@@ -23,6 +25,7 @@ func sqlConnect() (database *gorm.DB) {
 	db, err := gorm.Open(DBMS, CONNECT)
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&AnswerResult{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&AnswerResultSection{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -83,4 +86,11 @@ func stringToUint(str string) uint {
 	Uint32, _ := strconv.ParseUint(str, 10, 32)
 	Uint := uint(Uint32)
 	return Uint
+}
+
+// io.Readerをbyteのスライスに変換
+func StreamToByte(stream io.Reader) []byte {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(stream)
+	return buf.Bytes()
 }

@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -113,6 +117,57 @@ func TestCheckAnswer(t *testing.T) {
 	body := strings.NewReader(values.Encode())
 	req := httptest.NewRequest("POST", "/check_answer", body)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+	req.Header.Add("Cookie", cookie.Name+"="+cookie.Value)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+	log.Print(rec.Body)
+}
+
+func TestCheckAnswerSection(t *testing.T) {
+	envLoad()
+	e := router()
+	nowTime := time.Now()
+	nowTimeString := nowTime.Format(layout)
+	log.Print(nowTimeString)
+	otherFocusSecond := "26"
+	answerResultIds := "[6000,7000,6543,5432,2443,2334,2344,2111,2444,1111]"
+	userID := "66"
+	values := url.Values{}
+	values.Set("start_time", nowTimeString)
+	values.Set("end_time", nowTimeString)
+	values.Set("other_focus_second", otherFocusSecond)
+	values.Set("answer_result_ids", answerResultIds)
+	values.Set("user_id", userID)
+	values.Set("test", "true")
+
+	var buf bytes.Buffer
+	w := multipart.NewWriter(&buf)
+
+	file, err := os.Open("./data/testdata/testgoto1.mp4")
+	if err != nil {
+		log.Print(err)
+	}
+	defer file.Close()
+
+	fw, err := w.CreateFormFile("face_video", "./data/testdata/testgoto1.mp4")
+	if err != nil {
+		log.Print(err)
+	}
+	if _, err = io.Copy(fw, file); err != nil {
+		log.Print(err)
+	}
+
+	w.WriteField("start_time", nowTimeString)
+
+	_ = w.WriteField("end_time", nowTimeString)
+	_ = w.WriteField("other_focus_second", otherFocusSecond)
+	_ = w.WriteField("answer_result_ids", answerResultIds)
+	_ = w.WriteField("user_id", userID)
+	_ = w.WriteField("test", "true")
+	w.Close()
+
+	req := httptest.NewRequest("POST", "/check_answer_section", &buf)
+	req.Header.Set(echo.HeaderContentType, w.FormDataContentType())
 	req.Header.Add("Cookie", cookie.Name+"="+cookie.Value)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
