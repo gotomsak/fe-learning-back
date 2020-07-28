@@ -74,3 +74,14 @@ type AnswerResultSection struct {
 	StartTime           time.Time
 	EndTime             time.Time
 }
+
+// Questionnaire アンケート結果を保存するテーブルのstruct
+type Questionnaire struct {
+	gorm.Model
+	AnswerResultSectionID uint `gorm:"not null"`
+	UserID                uint `gorm:"not null"`
+	Concentration         int  // 集中
+	WhileDoing            bool // しながら
+	Cheating              bool // カンニング
+	Nonsense              bool // デタラメ
+}
