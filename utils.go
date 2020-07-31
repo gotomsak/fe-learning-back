@@ -26,6 +26,7 @@ func sqlConnect() (database *gorm.DB) {
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&AnswerResult{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&AnswerResultSection{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&Questionnaire{})
 	if err != nil {
 		panic(err.Error())
 	}
