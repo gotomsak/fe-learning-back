@@ -42,6 +42,12 @@ type QuestionSend struct {
 	Genre       string   `json:"genre"`
 }
 
+// AnswerResultSend checkAnswerのレスポンスをまとめたstruct
+type AnswerResultSend struct {
+	Result string `json:"result"`
+	Answer string `json:"answer"`
+}
+
 // User userテーブルのstruct
 type User struct {
 	gorm.Model
