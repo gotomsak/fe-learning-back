@@ -22,12 +22,18 @@ func signup(c echo.Context) error {
 	user.Email = c.FormValue("email")
 	if c.FormValue("test") == "true" {
 		tx := db.Begin()
-		error := tx.Create(&user).Error
+		err := tx.Create(&user).Error
 		tx.Rollback()
-		return error
+		if err != nil {
+			return c.NoContent(http.StatusInternalServerError)
+		}
+		return c.JSON(http.StatusOK, "testok")
 	}
-	error := db.Create(&user).Error
-	return error
+	err := db.Create(&user).Error
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, "ok")
 }
 
 func signin(c echo.Context) error {
@@ -46,10 +52,23 @@ func signin(c echo.Context) error {
 			MaxAge:   86400 * 7,
 			HttpOnly: true,
 		}
-		sess.Save(c.Request(), c.Response())
+		sess.Values["authenticated"] = true
+		if err := sess.Save(c.Request(), c.Response()); err != nil {
+			return c.NoContent(http.StatusInternalServerError)
+		}
+
 		return c.NoContent(http.StatusOK)
 	}
 	return passcheck
+}
+
+func signout(c echo.Context) error {
+	sess, _ := session.Get("session", c)
+	sess.Options = &sessions.Options{MaxAge: -1, Path: "/"}
+	if err := sess.Save(c.Request(), c.Response()); err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+	return c.NoContent(http.StatusOK)
 }
 
 func passwordHash(pw string) string {

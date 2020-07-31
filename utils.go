@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"math/rand"
 	"os"
 	"strconv"
@@ -11,6 +13,8 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+var layout = "2006-01-02 15:04:05"
+
 func sqlConnect() (database *gorm.DB) {
 	DBMS := os.Getenv("DBMS")
 	USER := os.Getenv("USERR")
@@ -20,6 +24,9 @@ func sqlConnect() (database *gorm.DB) {
 	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
 	db, err := gorm.Open(DBMS, CONNECT)
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&AnswerResult{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&AnswerResultSection{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&Questionnaire{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -38,7 +45,7 @@ func remove(ints []int, search int) []int {
 }
 
 // intsの中にsearchがあったらtrueを返す
-func searchIDs(ints []int, search int) bool {
+func searchIDs(ints []uint, search uint) bool {
 	for _, v := range ints {
 		if v == search {
 			return true
@@ -48,14 +55,15 @@ func searchIDs(ints []int, search int) bool {
 }
 
 // string型で受け取った数値のリストをInt型のリストにして返す
-func strToIntList(str string) []int {
-	intList := []int{}
+func strToUIntList(str string) []uint {
+	intList := []uint{}
 	str = strings.Trim(str, "[]")
 	strList := strings.Split(str, ",")
 	if str != "" {
 		for i := 0; i < len(strList); i++ {
-			n, _ := strconv.Atoi(strList[i])
-			intList = append(intList, n)
+			n, _ := strconv.ParseUint(strList[i], 10, 32)
+			un := uint(n)
+			intList = append(intList, un)
 		}
 	}
 	return intList
@@ -68,4 +76,22 @@ func shuffle(a []string) {
 		j := rand.Intn(i + 1)
 		a[i], a[j] = a[j], a[i]
 	}
+}
+
+func stringToTime(str string) time.Time {
+	t, _ := time.Parse(layout, str)
+	return t
+}
+
+func stringToUint(str string) uint {
+	Uint32, _ := strconv.ParseUint(str, 10, 32)
+	Uint := uint(Uint32)
+	return Uint
+}
+
+// io.Readerをbyteのスライスに変換
+func StreamToByte(stream io.Reader) []byte {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(stream)
+	return buf.Bytes()
 }

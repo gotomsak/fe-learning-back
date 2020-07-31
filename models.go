@@ -1,11 +1,15 @@
 package main
 
-import "github.com/jinzhu/gorm"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
 
 // GetQuestionIDs 解く問題のIDと解いた問題のIDのstruct
 type GetQuestionIDs struct {
-	QuestionIDs []int `json:"question_ids"`
-	SolvedIDs   []int `json:"solved_ids"`
+	QuestionIDs []uint `json:"question_ids"`
+	SolvedIDs   []uint `json:"solved_ids"`
 }
 
 // Question questionテーブルのstruct
@@ -44,4 +48,40 @@ type User struct {
 	Username       string `json:"username"`
 	Email          string `gorm:"type:varchar(100);unique_index"`
 	PasswordDigest string `json:"password_digest"`
+}
+
+// AnswerResult 解答の結果を保存するテーブルのstruct
+type AnswerResult struct {
+	gorm.Model
+	UserID           uint   `gorm:"not null"`
+	UserAnswer       string `gorm:"not null"` // userの選んだ答え
+	AnswerResult     string `gorm:"not null"` // correctかincorrect
+	MemoLog          string `gorm:"type:text;"`
+	OtherFocusSecond uint   `json:"other_focus_second"`
+	QuestionID       uint   `gorm:"not null"`
+	StartTime        time.Time
+	EndTime          time.Time
+}
+
+// AnswerResultSection 解答の結果のまとめを保存するテーブルのstruct
+type AnswerResultSection struct {
+	gorm.Model
+	UserID              uint   `gorm:"not null"`
+	AnswerResultIDs     string `gorm:"type:text;not null"`
+	CorrectAnswerNumber uint   `gorm:"not null"`
+	OtherFocusSecond    uint   `json:"other_focus_second"`
+	FaceVideoPath       string `gorm:"type:varchar(255);unique_index"`
+	StartTime           time.Time
+	EndTime             time.Time
+}
+
+// Questionnaire アンケート結果を保存するテーブルのstruct
+type Questionnaire struct {
+	gorm.Model
+	AnswerResultSectionID uint `gorm:"not null"`
+	UserID                uint `gorm:"not null"`
+	Concentration         int  // 集中
+	WhileDoing            bool // しながら
+	Cheating              bool // カンニング
+	Nonsense              bool // デタラメ
 }
