@@ -40,10 +40,21 @@ func checkAnswer(c echo.Context) error {
 
 	db.First(&question, questionID)
 	result := "incorrect"
+	var answer string
+	if question.AimgPath != "" {
+		answer = question.AimgPath
+	} else {
+		answer = question.Ans
+	}
+
 	if question.AimgPath == answerResult.UserAnswer || question.Ans == answerResult.UserAnswer {
 		result = "correct"
 	}
 	answerResult.AnswerResult = result
+	answerResultSend := AnswerResultSend{
+		Result: result,
+		Answer: answer,
+	}
 
 	if c.FormValue("test") == "true" {
 		tx := db.Begin()
@@ -61,5 +72,5 @@ func checkAnswer(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, result)
+	return c.JSON(http.StatusOK, answerResultSend)
 }
