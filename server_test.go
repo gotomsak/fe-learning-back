@@ -132,13 +132,7 @@ func TestCheckAnswerSection(t *testing.T) {
 	otherFocusSecond := "26"
 	answerResultIds := "[6000,7000,6543,5432,2443,2334,2344,2111,2444,1111]"
 	userID := "66"
-	values := url.Values{}
-	values.Set("start_time", nowTimeString)
-	values.Set("end_time", nowTimeString)
-	values.Set("other_focus_second", otherFocusSecond)
-	values.Set("answer_result_ids", answerResultIds)
-	values.Set("user_id", userID)
-	values.Set("test", "true")
+	correctAnswerNumber := "3"
 
 	var buf bytes.Buffer
 	w := multipart.NewWriter(&buf)
@@ -163,6 +157,7 @@ func TestCheckAnswerSection(t *testing.T) {
 	_ = w.WriteField("other_focus_second", otherFocusSecond)
 	_ = w.WriteField("answer_result_ids", answerResultIds)
 	_ = w.WriteField("user_id", userID)
+	_ = w.WriteField("correct_answer_number", correctAnswerNumber)
 	_ = w.WriteField("test", "true")
 	w.Close()
 
@@ -172,4 +167,34 @@ func TestCheckAnswerSection(t *testing.T) {
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
 	log.Print(rec.Body)
+}
+
+func TestSaveQuestionnaire(t *testing.T) {
+	envLoad()
+	e := router()
+	concentration := "3"
+	whileDoing := "true"
+	cheating := "true"
+	nonsense := "false"
+	answerResultSectionID := "3"
+	userID := "66"
+	buf := bytes.Buffer{}
+	w := multipart.NewWriter(&buf)
+
+	_ = w.WriteField("concentration", concentration)
+	_ = w.WriteField("while_doing", whileDoing)
+	_ = w.WriteField("cheating", cheating)
+	_ = w.WriteField("nonsense", nonsense)
+	_ = w.WriteField("user_id", userID)
+	_ = w.WriteField("answer_result_section_id", answerResultSectionID)
+	_ = w.WriteField("test", "true")
+	w.Close()
+
+	req := httptest.NewRequest("POST", "/save_questionnaire", &buf)
+	req.Header.Set(echo.HeaderContentType, w.FormDataContentType())
+	req.Header.Add("Cookie", cookie.Name+"="+cookie.Value)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+	log.Print(req.Body)
+
 }
