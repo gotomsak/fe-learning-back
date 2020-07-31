@@ -41,7 +41,7 @@ func checkAnswerSection(c echo.Context) error {
 
 	db := sqlConnect()
 	defer db.Close()
-	answerResultSection := &AnswerResultSection{
+	answerResultSection := AnswerResultSection{
 		UserID:              stringToUint(userID),
 		AnswerResultIDs:     answerResultIDs,
 		CorrectAnswerNumber: stringToUint(correctAnswerNumber),
