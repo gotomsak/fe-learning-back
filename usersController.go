@@ -51,6 +51,7 @@ func signin(c echo.Context) error {
 			Path:     "/",
 			MaxAge:   86400 * 7,
 			HttpOnly: true,
+			SameSite: http.SameSiteStrictMode,
 		}
 		sess.Values["authenticated"] = true
 		if err := sess.Save(c.Request(), c.Response()); err != nil {
