@@ -79,7 +79,8 @@ func shuffle(a []string) {
 }
 
 func stringToTime(str string) time.Time {
-	t, _ := time.Parse(layout, str)
+	jst, _ := time.LoadLocation("Asia/Tokyo")
+	t, _ := time.ParseInLocation(layout, str, jst)
 	return t
 }
 

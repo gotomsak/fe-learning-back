@@ -14,11 +14,13 @@ import (
 
 func router() *echo.Echo {
 	e := echo.New()
+	// key := []byte("super-secret-key")
+	// store := sessions.NewCookieStore(key)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	// e.Use(middleware.CORS())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{"http://localhost:3000", "https://localhost:3000", "https://192.168.1.10:3000"},
 		AllowCredentials: true,
 		AllowMethods:     []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 	}))
@@ -32,6 +34,7 @@ func router() *echo.Echo {
 	e.POST("/save_questionnaire", saveQuestionnaire)
 	e.POST("/signup", signup)
 	e.GET("/signout", signout)
+	e.GET("/check_session", checkSession)
 	return e
 }
 
