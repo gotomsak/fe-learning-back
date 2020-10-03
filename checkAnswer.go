@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo-contrib/session"
@@ -20,7 +21,9 @@ func checkAnswer(c echo.Context) error {
 	question := Question{}
 
 	startTime := c.FormValue("start_time")
+
 	endTime := c.FormValue("end_time")
+	fmt.Println(endTime)
 	otherFocusSecond := c.FormValue("other_focus_second")
 	uotherFocusSecond := stringToUint(otherFocusSecond)
 	questionID := c.FormValue("question_id")
@@ -51,10 +54,6 @@ func checkAnswer(c echo.Context) error {
 		result = "correct"
 	}
 	answerResult.AnswerResult = result
-	answerResultSend := AnswerResultSend{
-		Result: result,
-		Answer: answer,
-	}
 
 	if c.FormValue("test") == "true" {
 		tx := db.Begin()
@@ -70,6 +69,12 @@ func checkAnswer(c echo.Context) error {
 
 	if err != nil {
 		return err
+	}
+
+	answerResultSend := AnswerResultSend{
+		AnswerResultID: answerResult.ID,
+		Result:         result,
+		Answer:         answer,
 	}
 
 	return c.JSON(http.StatusOK, answerResultSend)

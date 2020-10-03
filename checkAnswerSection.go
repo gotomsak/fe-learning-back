@@ -6,10 +6,18 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
 func checkAnswerSection(c echo.Context) error {
+	sess, err := session.Get("session", c)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error")
+	}
+	if b, _ := sess.Values["authenticated"]; b != true {
+		return c.String(http.StatusUnauthorized, "401")
+	}
 	userID := c.FormValue("user_id")
 	startTime := c.FormValue("start_time")
 	endTime := c.FormValue("end_time")

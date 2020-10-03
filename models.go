@@ -44,8 +44,9 @@ type QuestionSend struct {
 
 // AnswerResultSend checkAnswerのレスポンスをまとめたstruct
 type AnswerResultSend struct {
-	Result string `json:"result"`
-	Answer string `json:"answer"`
+	AnswerResultID uint   `json:"answer_result_id"`
+	Result         string `json:"result"`
+	Answer         string `json:"answer"`
 }
 
 // User userテーブルのstruct
@@ -54,6 +55,12 @@ type User struct {
 	Username       string `json:"username"`
 	Email          string `gorm:"type:varchar(100);unique_index"`
 	PasswordDigest string `json:"password_digest"`
+}
+
+// UserSend Signup時に送られるdata
+type UserSend struct {
+	UserID   uint   `json:"user_id"`
+	Username string `json:"username"`
 }
 
 // AnswerResult 解答の結果を保存するテーブルのstruct
@@ -84,10 +91,10 @@ type AnswerResultSection struct {
 // Questionnaire アンケート結果を保存するテーブルのstruct
 type Questionnaire struct {
 	gorm.Model
-	AnswerResultSectionID uint `gorm:"not null"`
+	AnswerResultSectionID uint `json:"answer_result_section_id"`
 	UserID                uint `gorm:"not null"`
-	Concentration         int  // 集中
-	WhileDoing            bool // しながら
-	Cheating              bool // カンニング
-	Nonsense              bool // デタラメ
+	Concentration         int  `json:"concentration"`// 集中
+	WhileDoing            bool `json:"while_doing"`// しながら
+	Cheating              bool `json:"cheating"`// カンニング
+	Nonsense              bool `json:"nonsense"`// デタラメ
 }

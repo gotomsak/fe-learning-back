@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -51,13 +52,15 @@ func signin(c echo.Context) error {
 			Path:     "/",
 			MaxAge:   86400 * 7,
 			HttpOnly: true,
+			SameSite: http.SameSiteNoneMode,
+			Secure:   true,
 		}
 		sess.Values["authenticated"] = true
 		if err := sess.Save(c.Request(), c.Response()); err != nil {
 			return c.NoContent(http.StatusInternalServerError)
 		}
 
-		return c.NoContent(http.StatusOK)
+		return c.JSON(http.StatusOK, UserSend{UserID: user.ID, Username: user.Username})
 	}
 	return passcheck
 }
@@ -69,6 +72,17 @@ func signout(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	return c.NoContent(http.StatusOK)
+}
+
+func checkSession(c echo.Context) error {
+	log.Print(c.FormParams)
+	sess, _ := session.Get("session", c)
+	log.Print(sess.Values["authenticated"])
+	if b, _ := sess.Values["authenticated"]; b != true {
+		return c.String(http.StatusUnauthorized, "401")
+	}
+	return c.JSON(http.StatusOK, "200")
+
 }
 
 func passwordHash(pw string) string {
