@@ -93,8 +93,37 @@ type Questionnaire struct {
 	gorm.Model
 	AnswerResultSectionID uint `json:"answer_result_section_id"`
 	UserID                uint `gorm:"not null"`
-	Concentration         int  `json:"concentration"`// 集中
-	WhileDoing            bool `json:"while_doing"`// しながら
-	Cheating              bool `json:"cheating"`// カンニング
-	Nonsense              bool `json:"nonsense"`// デタラメ
+	Concentration         int  `json:"concentration"` // 集中
+	WhileDoing            bool `json:"while_doing"`   // しながら
+	Cheating              bool `json:"cheating"`      // カンニング
+	Nonsense              bool `json:"nonsense"`      // デタラメ
+}
+
+// Frequency 最高最低頻度
+type Frequency struct {
+	gorm.Model
+	UserID               uint    `gorm:"not null"`
+	MaxFrequencyVideo    string  `gorm:"type:varchar(255);unique_index"`
+	MinFrequencyVideo    string  `gorm:"type:varchar(255);unique_index"`
+	MaxBlinkFrequency    float64 `json:"max_blink_frequency"`
+	MinBlinkFrequency    float64 `json:"min_blink_frequency"`
+	MaxFaceMoveFrequency float64 `json:"max_face_move_frequency"`
+	MinFaceMoveFrequency float64 `json:"min_face_move_frequency"`
+	MaxBlinkNumber       float64 `json:"max_blink_number"`
+	MinBlinkNumber       float64 `json:"min_blink_number"`
+	MaxFaceMoveNumber    float64 `json:"max_face_move_number"`
+	MinFaceMoveNumber    float64 `json:"min_face_move_number"`
+}
+
+// ConcentrationData 集中度の保存
+type ConcentrationData struct {
+	gorm.Model
+	UserID                uint `gorm:"not null"`
+	AnswerResultSectionID uint `gorm:"not null"`
+	Blink                 uint
+	FaceMove              uint
+	W                     string
+	C1                    string
+	C2                    string
+	C3                    string
 }

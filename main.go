@@ -33,6 +33,8 @@ func router() *echo.Echo {
 	e.POST("/check_answer_section", checkAnswerSection)
 	e.POST("/save_questionnaire", saveQuestionnaire)
 	e.POST("/signup", signup)
+	e.POST("/init_max_frequency", initMaxFrequency)
+	e.POST("/init_min_frequency", initMinFrequency)
 	e.GET("/signout", signout)
 	e.GET("/check_session", checkSession)
 	return e
@@ -49,6 +51,8 @@ func main() {
 
 	envLoad()
 	e := router()
-
+	db := sqlConnect()
+	defer db.Close()
 	e.Logger.Fatal(e.Start(":1323"))
+
 }
