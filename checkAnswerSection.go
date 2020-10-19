@@ -24,6 +24,7 @@ func checkAnswerSection(c echo.Context) error {
 	otherFocusSecond := c.FormValue("other_focus_second")
 	answerResultIDs := c.FormValue("answer_result_ids")
 	correctAnswerNumber := c.FormValue("correct_answer_number")
+
 	videoFile, err := c.FormFile("face_video")
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
@@ -47,8 +48,25 @@ func checkAnswerSection(c echo.Context) error {
 		return err
 	}
 
+	blink := c.FormValue("blink")
+	faceMove := c.FormValue("face_move")
+	w := c.FormValue("w")
+	c1 := c.FormValue("c1")
+	c2 := c.FormValue("c2")
+	c3 := c.FormValue("c3")
+	fmt.Println(c1)
+
+	fmt.Println(c2)
+	fmt.Println(c3)
+	fmt.Println(w)
+
 	db := sqlConnect()
 	defer db.Close()
+
+	var user User
+	userIDInt := stringToUint(userID)
+	db.First(&user, userIDInt)
+
 	answerResultSection := AnswerResultSection{
 		UserID:              stringToUint(userID),
 		AnswerResultIDs:     answerResultIDs,
@@ -61,7 +79,7 @@ func checkAnswerSection(c echo.Context) error {
 
 	if c.FormValue("test") == "true" {
 		tx := db.Begin()
-		err := tx.Create(&answerResultSection).Error
+		err := tx.Create(&answerResultSection)
 		tx.Rollback()
 		if err != nil {
 			return c.NoContent(http.StatusInternalServerError)
@@ -71,6 +89,20 @@ func checkAnswerSection(c echo.Context) error {
 	err = db.Create(&answerResultSection).Error
 	if err != nil {
 		return err
+	}
+	concentrationData := ConcentrationData{
+		UserID:                user.ID,
+		AnswerResultSectionID: answerResultSection.ID,
+		Blink:                 stringToUint(blink),
+		FaceMove:              stringToUint(faceMove),
+		W:                     w,
+		C1:                    c1,
+		C2:                    c2,
+		C3:                    c3,
+	}
+	err = db.Create(&concentrationData).Error
+	if err != nil {
+		fmt.Println("noneConcentration")
 	}
 	return c.JSON(http.StatusOK, "ok")
 }

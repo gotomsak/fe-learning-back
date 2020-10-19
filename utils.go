@@ -27,6 +27,8 @@ func sqlConnect() (database *gorm.DB) {
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&AnswerResult{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&AnswerResultSection{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&Questionnaire{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&Frequency{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&ConcentrationData{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -91,7 +93,7 @@ func stringToUint(str string) uint {
 }
 
 // io.Readerをbyteのスライスに変換
-func StreamToByte(stream io.Reader) []byte {
+func streamToByte(stream io.Reader) []byte {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(stream)
 	return buf.Bytes()

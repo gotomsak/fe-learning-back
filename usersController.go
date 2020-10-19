@@ -75,7 +75,6 @@ func signout(c echo.Context) error {
 }
 
 func checkSession(c echo.Context) error {
-	log.Print(c.FormParams)
 	sess, _ := session.Get("session", c)
 	log.Print(sess.Values["authenticated"])
 	if b, _ := sess.Values["authenticated"]; b != true {
