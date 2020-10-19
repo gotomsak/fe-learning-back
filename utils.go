@@ -93,7 +93,7 @@ func stringToUint(str string) uint {
 }
 
 // io.Readerをbyteのスライスに変換
-func StreamToByte(stream io.Reader) []byte {
+func streamToByte(stream io.Reader) []byte {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(stream)
 	return buf.Bytes()
