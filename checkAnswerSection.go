@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -47,18 +48,16 @@ func checkAnswerSection(c echo.Context) error {
 	if _, err = io.Copy(dstFile, src); err != nil {
 		return err
 	}
-
 	blink := c.FormValue("blink")
 	faceMove := c.FormValue("face_move")
+	angle := c.FormValue("angle")
 	w := c.FormValue("w")
 	c1 := c.FormValue("c1")
 	c2 := c.FormValue("c2")
 	c3 := c.FormValue("c3")
-	fmt.Println(c1)
-
-	fmt.Println(c2)
-	fmt.Println(c3)
-	fmt.Println(w)
+	method1 := c.FormValue("method1")
+	concentration := c.FormValue("concentration")
+	method2 := c.FormValue("method2")
 
 	db := sqlConnect()
 	defer db.Close()
@@ -90,19 +89,31 @@ func checkAnswerSection(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	concentrationData := ConcentrationData{
-		UserID:                user.ID,
-		AnswerResultSectionID: answerResultSection.ID,
-		Blink:                 stringToUint(blink),
-		FaceMove:              stringToUint(faceMove),
-		W:                     w,
-		C1:                    c1,
-		C2:                    c2,
-		C3:                    c3,
+	mc, ctx := mongoConnect()
+	defer mc.Disconnect(ctx)
+
+	if method1 == "true" {
+		col1 := mc.Database("fe-concentration").Collection("concentration")
+		col1.InsertOne(context.Background(), ConcentrationData{
+			UserID:                user.ID,
+			AnswerResultSectionID: answerResultSection.ID,
+			Blink:                 blink,
+			FaceMove:              faceMove,
+			Angle:                 angle,
+			W:                     w,
+			C1:                    c1,
+			C2:                    c2,
+			C3:                    c3,
+		})
 	}
-	err = db.Create(&concentrationData).Error
-	if err != nil {
-		fmt.Println("noneConcentration")
+	if method2 == "true" {
+		col2 := mc.Database("fe-concentration").Collection("son-concentration")
+		col2.InsertOne(context.Background(), SonConcentrationData{
+			UserID:                user.ID,
+			AnswerResultSectionID: answerResultSection.ID,
+			Concentration:         concentration,
+		})
 	}
+
 	return c.JSON(http.StatusOK, "ok")
 }

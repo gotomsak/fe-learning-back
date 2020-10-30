@@ -120,10 +120,19 @@ type ConcentrationData struct {
 	gorm.Model
 	UserID                uint `gorm:"not null"`
 	AnswerResultSectionID uint `gorm:"not null"`
-	Blink                 uint
-	FaceMove              uint
+	Blink                 string `gorm:"type:varchar(255)"`
+	FaceMove              string
+	Angle                 string
 	W                     string
 	C1                    string
 	C2                    string
 	C3                    string
+}
+
+// SonConcentrationData 集中度の保存
+type SonConcentrationData struct {
+	gorm.Model
+	UserID                uint `gorm:"not null"`
+	AnswerResultSectionID uint `gorm:"not null"`
+	Concentration         string
 }

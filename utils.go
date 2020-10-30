@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"math/rand"
 	"os"
@@ -11,6 +12,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var layout = "2006-01-02 15:04:05"
@@ -29,10 +32,27 @@ func sqlConnect() (database *gorm.DB) {
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&Questionnaire{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&Frequency{})
 	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&ConcentrationData{})
+	db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&SonConcentrationData{})
 	if err != nil {
 		panic(err.Error())
 	}
 	return db
+}
+
+func mongoConnect() (database *mongo.Client, Context context.Context) {
+	USER := os.Getenv("USERR")
+	PASS := os.Getenv("PASS")
+	PROTOCOL := os.Getenv("PROTOCOLMONGO")
+	uri := "mongodb://" + USER + ":" + PASS + "@" + PROTOCOL
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	c, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+
+	defer cancel()
+	if err != nil {
+		panic(err.Error())
+	}
+	return c, ctx
 }
 
 // intsにsearchがあったらそれを削除してリストを返す
