@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/labstack/echo-contrib/session"
@@ -28,37 +26,14 @@ func initMinFrequency(c echo.Context) error {
 	var minBlinkFrequency float64 = (minBlinkNumberFloat / 60) * 5
 	var minFaceMoveFrequency float64 = (minFaceMoveNumberFloat / 60) * 5
 
-	minFrequencyVideo, err := c.FormFile("min_frequency_video")
-	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
-	src, err := minFrequencyVideo.Open()
-	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
-	defer src.Close()
-	faceVideoDir := "./data/" + userID
-	faceVideoFile := "minFrequency" + ".mp4"
-	if err := os.MkdirAll(faceVideoDir, 0777); err != nil {
-		fmt.Println(err)
-	}
-	dstFile, err := os.Create(faceVideoDir + "/" + faceVideoFile)
-	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
-	defer dstFile.Close()
-	if _, err = io.Copy(dstFile, src); err != nil {
-		return err
-	}
-
 	db := sqlConnect()
 	defer db.Close()
 	var frequency Frequency
 	err = db.Where("user_id = ?", userID).First(&frequency).Error
 	if err != nil {
 		frequency := Frequency{
-			UserID:               stringToUint(userID),
-			MinFrequencyVideo:    faceVideoDir + "/" + faceVideoFile,
+			UserID: stringToUint(userID),
+
 			MinFaceMoveNumber:    minFaceMoveNumberFloat,
 			MinFaceMoveFrequency: minFaceMoveFrequency,
 			MinBlinkNumber:       minBlinkNumberFloat,
@@ -70,7 +45,8 @@ func initMinFrequency(c echo.Context) error {
 			return err
 		}
 	}
-	db.Model(&frequency).Updates(Frequency{MinFrequencyVideo: faceVideoDir + "/" + faceVideoFile,
+	db.Model(&frequency).Updates(Frequency{
+
 		MinFaceMoveNumber:    minFaceMoveNumberFloat,
 		MinFaceMoveFrequency: minFaceMoveFrequency,
 		MinBlinkNumber:       minBlinkNumberFloat,

@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/labstack/echo-contrib/session"
@@ -23,7 +21,7 @@ func initMaxFrequency(c echo.Context) error {
 	userID := c.FormValue("user_id")
 	maxBlinkNumber := c.FormValue("max_blink_number")
 	maxFaceMoveNumber := c.FormValue("max_face_move_number")
-	maxFrequencyVideo, err := c.FormFile("max_frequency_video")
+
 	maxBlinkNumberFloat, _ := strconv.ParseFloat(maxBlinkNumber, 64)
 	maxFaceMoveNumberFloat, _ := strconv.ParseFloat(maxFaceMoveNumber, 64)
 	var maxBlinkFrequency float64 = (maxBlinkNumberFloat / 60) * 5
@@ -33,27 +31,6 @@ func initMaxFrequency(c echo.Context) error {
 		fmt.Println(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
-	src, err := maxFrequencyVideo.Open()
-	if err != nil {
-		fmt.Println(err)
-		return c.NoContent(http.StatusInternalServerError)
-	}
-	defer src.Close()
-	faceVideoDir := "./data/" + userID
-	faceVideoFile := "maxFrequency" + ".mp4"
-	if err := os.MkdirAll(faceVideoDir, 0777); err != nil {
-		fmt.Println(err)
-	}
-	dstFile, err := os.Create(faceVideoDir + "/" + faceVideoFile)
-	if err != nil {
-		fmt.Println(err)
-		return c.NoContent(http.StatusInternalServerError)
-	}
-	defer dstFile.Close()
-	if _, err = io.Copy(dstFile, src); err != nil {
-		fmt.Println(err)
-		return err
-	}
 
 	db := sqlConnect()
 	defer db.Close()
@@ -62,8 +39,8 @@ func initMaxFrequency(c echo.Context) error {
 	err = db.Where("user_id = ?", userID).First(&frequency).Error
 	if err != nil {
 		frequency := Frequency{
-			UserID:               stringToUint(userID),
-			MaxFrequencyVideo:    faceVideoDir + "/" + faceVideoFile,
+			UserID: stringToUint(userID),
+
 			MaxFaceMoveNumber:    maxFaceMoveNumberFloat,
 			MaxFaceMoveFrequency: maxFaceMoveFrequency,
 			MaxBlinkNumber:       maxBlinkNumberFloat,
@@ -75,7 +52,8 @@ func initMaxFrequency(c echo.Context) error {
 			return err
 		}
 	}
-	err = db.Model(&frequency).Updates(Frequency{MaxFrequencyVideo: faceVideoDir + "/" + faceVideoFile,
+	err = db.Model(&frequency).Updates(Frequency{
+
 		MaxFaceMoveNumber:    maxFaceMoveNumberFloat,
 		MaxFaceMoveFrequency: maxFaceMoveFrequency,
 		MaxBlinkNumber:       maxBlinkNumberFloat,

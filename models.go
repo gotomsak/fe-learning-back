@@ -83,9 +83,10 @@ type AnswerResultSection struct {
 	AnswerResultIDs     string `gorm:"type:text;not null"`
 	CorrectAnswerNumber uint   `gorm:"not null"`
 	OtherFocusSecond    uint   `json:"other_focus_second"`
-	FaceVideoPath       string `gorm:"type:varchar(255);unique_index"`
-	StartTime           time.Time
-	EndTime             time.Time
+	// FaceVideoPath       string `gorm:"type:varchar(255);unique_index"`
+	FaceImagePath string `gorm:"not null"`
+	StartTime     time.Time
+	EndTime       time.Time
 }
 
 // Questionnaire アンケート結果を保存するテーブルのstruct
@@ -102,9 +103,9 @@ type Questionnaire struct {
 // Frequency 最高最低頻度
 type Frequency struct {
 	gorm.Model
-	UserID               uint    `gorm:"not null"`
-	MaxFrequencyVideo    string  `gorm:"type:varchar(255);unique_index"`
-	MinFrequencyVideo    string  `gorm:"type:varchar(255);unique_index"`
+	UserID uint `gorm:"not null"`
+	// MaxFrequencyVideo    string  `gorm:"type:varchar(255);unique_index"`
+	// MinFrequencyVideo    string  `gorm:"type:varchar(255);unique_index"`
 	MaxBlinkFrequency    float64 `json:"max_blink_frequency"`
 	MinBlinkFrequency    float64 `json:"min_blink_frequency"`
 	MaxFaceMoveFrequency float64 `json:"max_face_move_frequency"`
@@ -118,8 +119,9 @@ type Frequency struct {
 // ConcentrationData 集中度の保存
 type ConcentrationData struct {
 	gorm.Model
-	UserID                uint `gorm:"not null"`
-	AnswerResultSectionID uint `gorm:"not null"`
+	UserID                uint   `gorm:"not null"`
+	AnswerResultSectionID uint   `gorm:"not null"`
+	FaceImagePath         string `gorm:"not null"`
 	Blink                 string `gorm:"type:varchar(255)"`
 	FaceMove              string
 	Angle                 string
@@ -132,7 +134,8 @@ type ConcentrationData struct {
 // SonConcentrationData 集中度の保存
 type SonConcentrationData struct {
 	gorm.Model
-	UserID                uint `gorm:"not null"`
-	AnswerResultSectionID uint `gorm:"not null"`
+	UserID                uint   `gorm:"not null"`
+	AnswerResultSectionID uint   `gorm:"not null"`
+	FaceImagePath         string `gorm:"not null"`
 	Concentration         string
 }

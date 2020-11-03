@@ -2,10 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"net/http"
-	"os"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -26,28 +23,6 @@ func checkAnswerSection(c echo.Context) error {
 	answerResultIDs := c.FormValue("answer_result_ids")
 	correctAnswerNumber := c.FormValue("correct_answer_number")
 
-	videoFile, err := c.FormFile("face_video")
-	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
-	src, err := videoFile.Open()
-	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
-	defer src.Close()
-	faceVideoDir := "./data/" + userID
-	faceVideoFile := endTime + ".mp4"
-	if err := os.MkdirAll(faceVideoDir, 0777); err != nil {
-		fmt.Println(err)
-	}
-	dstFile, err := os.Create(faceVideoDir + "/" + faceVideoFile)
-	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
-	defer dstFile.Close()
-	if _, err = io.Copy(dstFile, src); err != nil {
-		return err
-	}
 	blink := c.FormValue("blink")
 	faceMove := c.FormValue("face_move")
 	angle := c.FormValue("angle")
@@ -58,6 +33,7 @@ func checkAnswerSection(c echo.Context) error {
 	method1 := c.FormValue("method1")
 	concentration := c.FormValue("concentration")
 	method2 := c.FormValue("method2")
+	faceImagePath := c.FormValue("face_image_path")
 
 	db := sqlConnect()
 	defer db.Close()
@@ -71,7 +47,7 @@ func checkAnswerSection(c echo.Context) error {
 		AnswerResultIDs:     answerResultIDs,
 		CorrectAnswerNumber: stringToUint(correctAnswerNumber),
 		OtherFocusSecond:    stringToUint(otherFocusSecond),
-		FaceVideoPath:       faceVideoDir + "/" + faceVideoFile,
+		FaceImagePath:       faceImagePath,
 		StartTime:           stringToTime(startTime),
 		EndTime:             stringToTime(endTime),
 	}
@@ -97,6 +73,7 @@ func checkAnswerSection(c echo.Context) error {
 		col1.InsertOne(context.Background(), ConcentrationData{
 			UserID:                user.ID,
 			AnswerResultSectionID: answerResultSection.ID,
+			FaceImagePath:         faceImagePath,
 			Blink:                 blink,
 			FaceMove:              faceMove,
 			Angle:                 angle,
@@ -111,6 +88,7 @@ func checkAnswerSection(c echo.Context) error {
 		col2.InsertOne(context.Background(), SonConcentrationData{
 			UserID:                user.ID,
 			AnswerResultSectionID: answerResultSection.ID,
+			FaceImagePath:         faceImagePath,
 			Concentration:         concentration,
 		})
 	}

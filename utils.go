@@ -118,3 +118,26 @@ func streamToByte(stream io.Reader) []byte {
 	buf.ReadFrom(stream)
 	return buf.Bytes()
 }
+
+// minFrequencyVideo, err := c.FormFile("min_frequency_video")
+// if err != nil {
+// 	return c.NoContent(http.StatusInternalServerError)
+// }
+// src, err := minFrequencyVideo.Open()
+// if err != nil {
+// 	return c.NoContent(http.StatusInternalServerError)
+// }
+// defer src.Close()
+// faceVideoDir := "./data/" + userID
+// faceVideoFile := "minFrequency" + ".mp4"
+// if err := os.MkdirAll(faceVideoDir, 0777); err != nil {
+// 	fmt.Println(err)
+// }
+// dstFile, err := os.Create(faceVideoDir + "/" + faceVideoFile)
+// if err != nil {
+// 	return c.NoContent(http.StatusInternalServerError)
+// }
+// defer dstFile.Close()
+// if _, err = io.Copy(dstFile, src); err != nil {
+// 	return err
+// }
