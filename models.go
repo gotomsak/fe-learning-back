@@ -42,6 +42,11 @@ type QuestionSend struct {
 	Genre       string   `json:"genre"`
 }
 
+// AnswerResultSectionIDSend クライアントに送信するsectionID
+type AnswerResultSectionIDSend struct {
+	AnswerResultSectionID uint `json:"answer_result_section_id"`
+}
+
 // AnswerResultSend checkAnswerのレスポンスをまとめたstruct
 type AnswerResultSend struct {
 	AnswerResultID uint   `json:"answer_result_id"`

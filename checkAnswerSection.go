@@ -92,6 +92,8 @@ func checkAnswerSection(c echo.Context) error {
 			Concentration:         concentration,
 		})
 	}
+	answerResultSectionIDSend := AnswerResultSectionIDSend{}
+	answerResultSectionIDSend.AnswerResultSectionID = answerResultSection.ID
 
-	return c.JSON(http.StatusOK, "ok")
+	return c.JSON(http.StatusOK, answerResultSectionIDSend)
 }
