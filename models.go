@@ -58,8 +58,15 @@ type AnswerResultSend struct {
 type User struct {
 	gorm.Model
 	Username       string `json:"username"`
-	Email          string `gorm:"type:varchar(100);unique_index"`
+	Email          string `json:"email" gorm:"type:varchar(100);unique_index"`
 	PasswordDigest string `json:"password_digest"`
+}
+
+// UserSignin userのサインイン時のstruct
+type UserSignin struct {
+	gorm.Model
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 // UserSend Signup時に送られるdata

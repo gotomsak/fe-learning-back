@@ -41,8 +41,13 @@ func signin(c echo.Context) error {
 	db := sqlConnect()
 	defer db.Close()
 	user := User{}
-	db.Where("email = ?", c.FormValue("email")).Find(&user)
-	passDigest := c.FormValue("password")
+	u := new(UserSignin)
+	if err := c.Bind(u); err != nil {
+		return err
+	}
+
+	db.Where("email = ?", u.Email).Find(&user)
+	passDigest := u.Password
 
 	passcheck := bcrypt.CompareHashAndPassword([]byte(user.PasswordDigest), []byte(passDigest))
 
