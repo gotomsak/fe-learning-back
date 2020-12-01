@@ -78,14 +78,14 @@ type UserSend struct {
 // AnswerResult 解答の結果を保存するテーブルのstruct
 type AnswerResult struct {
 	gorm.Model
-	UserID           uint   `gorm:"not null"`
-	UserAnswer       string `gorm:"not null"` // userの選んだ答え
-	AnswerResult     string `gorm:"not null"` // correctかincorrect
-	MemoLog          string `gorm:"type:text;"`
-	OtherFocusSecond uint   `json:"other_focus_second"`
-	QuestionID       uint   `gorm:"not null"`
-	StartTime        time.Time
-	EndTime          time.Time
+	UserID           uint      `gorm:"not null"`
+	UserAnswer       string    `gorm:"not null"` // userの選んだ答え
+	AnswerResult     string    `gorm:"not null"` // correctかincorrect
+	MemoLog          string    `gorm:"type:text;"`
+	OtherFocusSecond uint      `json:"other_focus_second"`
+	QuestionID       uint      `gorm:"not null"`
+	StartTime        time.Time `json:"start_time"`
+	EndTime          time.Time `json:"end_time"`
 }
 
 // AnswerResultSection 解答の結果のまとめを保存するテーブルのstruct
@@ -96,9 +96,9 @@ type AnswerResultSection struct {
 	CorrectAnswerNumber uint   `json:"correct_answer_number" gorm:"not null"`
 	OtherFocusSecond    uint   `json:"other_focus_second"`
 	// FaceVideoPath       string `gorm:"type:varchar(255);unique_index"`
-	FaceImagePath string `json:"face_image_path" gorm:"not null"`
-	StartTime     time.Time
-	EndTime       time.Time
+	FaceImagePath string    `json:"face_image_path" gorm:"not null"`
+	StartTime     time.Time `json:"start_time"`
+	EndTime       time.Time `json:"end_time"`
 }
 
 // CheckAnswerSection sectionごとの問題が送信されてきた時のbindのstruct
@@ -120,8 +120,8 @@ type CheckAnswerSection struct {
 	Concentration []float64 `json:"concentration"`
 	Method1       bool      `json:"method1"`
 	Method2       bool      `json:"method2"`
-	StartTime     time.Time
-	EndTime       time.Time
+	StartTime     string    `json:"start_time"`
+	EndTime       string    `json:"end_time"`
 }
 
 // Questionnaire アンケート結果を保存するテーブルのstruct

@@ -46,8 +46,8 @@ func checkAnswerSection(c echo.Context) error {
 		CorrectAnswerNumber: cas.CorrectAnswerNumber,
 		OtherFocusSecond:    cas.OtherFocusSecond,
 		FaceImagePath:       cas.FaceImagePath,
-		StartTime:           cas.StartTime,
-		EndTime:             cas.EndTime,
+		StartTime:           stringToTime(cas.StartTime),
+		EndTime:             stringToTime(cas.EndTime),
 	}
 
 	if c.FormValue("test") == "true" {
