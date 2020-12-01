@@ -2,54 +2,52 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func checkAnswerSection(c echo.Context) error {
 	sess, err := session.Get("session", c)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Error")
+		return c.String(http.StatusInternalServerError, "Please sign in")
 	}
 	if b, _ := sess.Values["authenticated"]; b != true {
 		return c.String(http.StatusUnauthorized, "401")
 	}
-	userID := c.FormValue("user_id")
-	startTime := c.FormValue("start_time")
-	endTime := c.FormValue("end_time")
-	otherFocusSecond := c.FormValue("other_focus_second")
-	answerResultIDs := c.FormValue("answer_result_ids")
-	correctAnswerNumber := c.FormValue("correct_answer_number")
 
-	blink := c.FormValue("blink")
-	faceMove := c.FormValue("face_move")
-	angle := c.FormValue("angle")
-	w := c.FormValue("w")
-	c1 := c.FormValue("c1")
-	c2 := c.FormValue("c2")
-	c3 := c.FormValue("c3")
-	method1 := c.FormValue("method1")
-	concentration := c.FormValue("concentration")
-	method2 := c.FormValue("method2")
-	faceImagePath := c.FormValue("face_image_path")
+	cas := new(CheckAnswerSection)
+	if err = c.Bind(cas); err != nil {
+		return c.String(http.StatusInternalServerError, "The format is different")
+	}
+	fmt.Println(cas)
 
 	db := sqlConnect()
 	defer db.Close()
+	mc, ctx := mongoConnect()
+	defer mc.Disconnect(ctx)
 
-	var user User
-	userIDInt := stringToUint(userID)
-	db.First(&user, userIDInt)
+	results := mc.Database("fe-concentration").Collection("answer_result_sectoin_ids")
+	res, err := results.InsertOne(context.Background(), Results{ResultIDs: cas.AnswerResultIDs})
+	var resID string
+	if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
+		resID = oid.Hex()
 
+	} else {
+
+		return c.JSON(http.StatusInternalServerError, "Not objectid.ObjectID, do what you want")
+	}
 	answerResultSection := AnswerResultSection{
-		UserID:              stringToUint(userID),
-		AnswerResultIDs:     answerResultIDs,
-		CorrectAnswerNumber: stringToUint(correctAnswerNumber),
-		OtherFocusSecond:    stringToUint(otherFocusSecond),
-		FaceImagePath:       faceImagePath,
-		StartTime:           stringToTime(startTime),
-		EndTime:             stringToTime(endTime),
+		UserID:              cas.UserID,
+		AnswerResultIDs:     resID,
+		CorrectAnswerNumber: cas.CorrectAnswerNumber,
+		OtherFocusSecond:    cas.OtherFocusSecond,
+		FaceImagePath:       cas.FaceImagePath,
+		StartTime:           stringToTime(cas.StartTime),
+		EndTime:             stringToTime(cas.EndTime),
 	}
 
 	if c.FormValue("test") == "true" {
@@ -65,31 +63,29 @@ func checkAnswerSection(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	mc, ctx := mongoConnect()
-	defer mc.Disconnect(ctx)
 
-	if method1 == "true" {
+	if cas.Method1 == true {
 		col1 := mc.Database("fe-concentration").Collection("concentration")
 		col1.InsertOne(context.Background(), ConcentrationData{
-			UserID:                user.ID,
+			UserID:                cas.UserID,
 			AnswerResultSectionID: answerResultSection.ID,
-			FaceImagePath:         faceImagePath,
-			Blink:                 blink,
-			FaceMove:              faceMove,
-			Angle:                 angle,
-			W:                     w,
-			C1:                    c1,
-			C2:                    c2,
-			C3:                    c3,
+			FaceImagePath:         cas.FaceImagePath,
+			Blink:                 cas.Blink,
+			FaceMove:              cas.FaceMove,
+			Angle:                 cas.Angle,
+			W:                     cas.W,
+			C1:                    cas.C1,
+			C2:                    cas.C2,
+			C3:                    cas.C3,
 		})
 	}
-	if method2 == "true" {
+	if cas.Method2 == true {
 		col2 := mc.Database("fe-concentration").Collection("son-concentration")
 		col2.InsertOne(context.Background(), SonConcentrationData{
-			UserID:                user.ID,
+			UserID:                cas.UserID,
 			AnswerResultSectionID: answerResultSection.ID,
-			FaceImagePath:         faceImagePath,
-			Concentration:         concentration,
+			FaceImagePath:         cas.FaceImagePath,
+			Concentration:         cas.Concentration,
 		})
 	}
 	answerResultSectionIDSend := AnswerResultSectionIDSend{}

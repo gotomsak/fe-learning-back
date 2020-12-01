@@ -43,13 +43,12 @@ func signin(c echo.Context) error {
 	user := User{}
 	u := new(UserSignin)
 	if err := c.Bind(u); err != nil {
-		return err
+		return c.JSON(http.StatusInternalServerError, "Faild Bind")
 	}
 
 	db.Where("email = ?", u.Email).Find(&user)
-	passDigest := u.Password
 
-	passcheck := bcrypt.CompareHashAndPassword([]byte(user.PasswordDigest), []byte(passDigest))
+	passcheck := bcrypt.CompareHashAndPassword([]byte(user.PasswordDigest), []byte(u.Password))
 
 	if passcheck == nil {
 		sess, _ := session.Get("session", c)
