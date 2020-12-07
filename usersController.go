@@ -14,23 +14,24 @@ import (
 func signup(c echo.Context) error {
 	db := sqlConnect()
 	defer db.Close()
-	user := User{}
 
-	password := c.FormValue("password")
-	hash := passwordHash(password)
-	user.Username = c.FormValue("username")
-	user.PasswordDigest = hash
-	user.Email = c.FormValue("email")
+	u := new(User)
+	if err := c.Bind(u); err != nil {
+		return c.JSON(http.StatusInternalServerError, "Faild Bind")
+	}
+
+	u.PasswordDigest = passwordHash(u.PasswordDigest)
+
 	if c.FormValue("test") == "true" {
 		tx := db.Begin()
-		err := tx.Create(&user).Error
+		err := tx.Create(&u).Error
 		tx.Rollback()
 		if err != nil {
 			return c.NoContent(http.StatusInternalServerError)
 		}
 		return c.JSON(http.StatusOK, "testok")
 	}
-	err := db.Create(&user).Error
+	err := db.Create(&u).Error
 	if err != nil {
 		return err
 	}
