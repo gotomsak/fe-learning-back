@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -15,23 +16,27 @@ func signup(c echo.Context) error {
 	db := sqlConnect()
 	defer db.Close()
 
-	u := new(User)
+	u := new(UserSignup)
+	user := User{}
 	if err := c.Bind(u); err != nil {
 		return c.JSON(http.StatusInternalServerError, "Faild Bind")
 	}
+	fmt.Println(u)
 
-	u.PasswordDigest = passwordHash(u.PasswordDigest)
+	user.PasswordDigest = passwordHash(u.Password)
+	user.Username = u.Username
+	user.Email = u.Email
 
 	if c.FormValue("test") == "true" {
 		tx := db.Begin()
-		err := tx.Create(&u).Error
+		err := tx.Create(&user).Error
 		tx.Rollback()
 		if err != nil {
 			return c.NoContent(http.StatusInternalServerError)
 		}
 		return c.JSON(http.StatusOK, "testok")
 	}
-	err := db.Create(&u).Error
+	err := db.Create(&user).Error
 	if err != nil {
 		return err
 	}
