@@ -62,6 +62,14 @@ type User struct {
 	PasswordDigest string `json:"password_digest"`
 }
 
+// UserSignup userのサインアップ時のstruct
+type UserSignup struct {
+	gorm.Model
+	Username string `json:"username"`
+	Email    string `json:"email" gorm:"type:varchar(100);unique_index"`
+	Password string `json:"password"`
+}
+
 // UserSignin userのサインイン時のstruct
 type UserSignin struct {
 	gorm.Model
