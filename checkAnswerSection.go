@@ -35,17 +35,14 @@ func checkAnswerSection(c echo.Context) error {
 	var resID string
 	if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
 		resID = oid.Hex()
-
 	} else {
-
 		return c.JSON(http.StatusInternalServerError, "Not objectid.ObjectID, do what you want")
 	}
+
 	answerResultSection := AnswerResultSection{
 		UserID:              cas.UserID,
 		AnswerResultIDs:     resID,
 		CorrectAnswerNumber: cas.CorrectAnswerNumber,
-		OtherFocusSecond:    cas.OtherFocusSecond,
-		FaceImagePath:       cas.FaceImagePath,
 		StartTime:           stringToTime(cas.StartTime),
 		EndTime:             stringToTime(cas.EndTime),
 	}
@@ -64,30 +61,6 @@ func checkAnswerSection(c echo.Context) error {
 		return err
 	}
 
-	if cas.Method1 == true {
-		col1 := mc.Database("fe-concentration").Collection("concentration")
-		col1.InsertOne(context.Background(), ConcentrationData{
-			UserID:                cas.UserID,
-			AnswerResultSectionID: answerResultSection.ID,
-			FaceImagePath:         cas.FaceImagePath,
-			Blink:                 cas.Blink,
-			FaceMove:              cas.FaceMove,
-			Angle:                 cas.Angle,
-			W:                     cas.W,
-			C1:                    cas.C1,
-			C2:                    cas.C2,
-			C3:                    cas.C3,
-		})
-	}
-	if cas.Method2 == true {
-		col2 := mc.Database("fe-concentration").Collection("son-concentration")
-		col2.InsertOne(context.Background(), SonConcentrationData{
-			UserID:                cas.UserID,
-			AnswerResultSectionID: answerResultSection.ID,
-			FaceImagePath:         cas.FaceImagePath,
-			Concentration:         cas.Concentration,
-		})
-	}
 	answerResultSectionIDSend := AnswerResultSectionIDSend{}
 	answerResultSectionIDSend.AnswerResultSectionID = answerResultSection.ID
 

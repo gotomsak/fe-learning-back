@@ -1,51 +1,12 @@
 version: '3'
 
 services:
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-    depends_on:
-      - db
 
-  db:
-    image: mariadb
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${ROOTPASS}
+  go:
+    build: .
+    tty: true
     volumes:
-      - ./db/data:/var/lib/mysql
+      - .:/go/src/app
+      - ../../../../../data:/data
     ports:
-      - 3306:3306
-    container_name: maria_mysql_container
-
-  mongo:
-    image: mongo
-    restart: always
-    ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${USERR}
-      MONGO_INITDB_ROOT_PASSWORD: ${ROOTPASS}
-  
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ROOTPASS}
-
-
-  # go:
-  #   build: .
-  #   tty: true
-  #   volumes:
-  #     - .:/go/src/app
-  #     - ../../../../../data:/data
-  #   ports:
-  #     - 1323:1323
-
-
+      - 1323:1323
