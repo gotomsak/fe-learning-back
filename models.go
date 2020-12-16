@@ -109,11 +109,9 @@ type AnswerResultSection struct {
 
 // CheckAnswerSection sectionごとの問題が送信されてきた時のbindのstruct
 type CheckAnswerSection struct {
-	gorm.Model
 	UserID              uint     `json:"user_id" gorm:"not null"`
 	AnswerResultIDs     []uint64 `json:"answer_result_ids" gorm:"type:text;not null"`
 	CorrectAnswerNumber uint     `json:"correct_answer_number" gorm:"not null"`
-	OtherFocusSecond    uint     `json:"other_focus_second"`
 	StartTime           string   `json:"start_time"`
 	EndTime             string   `json:"end_time"`
 }
@@ -134,7 +132,7 @@ type CheckAnswer struct {
 type Questionnaire struct {
 	gorm.Model
 	AnswerResultSectionID uint `json:"answer_result_section_id"`
-	UserID                uint `gorm:"not null"`
+	UserID                uint `json:"user_id" gorm:"not null"`
 	Concentration         int  `json:"concentration"` // 集中
 	WhileDoing            bool `json:"while_doing"`   // しながら
 	Cheating              bool `json:"cheating"`      // カンニング
