@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo-contrib/session"
@@ -24,20 +23,26 @@ func checkAnswer(c echo.Context) error {
 	if err = c.Bind(ca); err != nil {
 		return c.String(http.StatusInternalServerError, "The format is different")
 	}
-	fmt.Println("kusoga")
-	mc, ctx := mongoConnect()
-	defer mc.Disconnect(ctx)
+	var resID string = ""
+	if len(ca.ConcentrationData) != 0 {
+		mc, ctx := mongoConnect()
+		defer mc.Disconnect(ctx)
 
-	results := mc.Database("fe-concentration").Collection("concentration")
-	concData := ConcentrationData{
-		ConcentrationData: ca.ConcentrationData,
-	}
-	res, err := results.InsertOne(context.Background(), concData)
-	var resID string
-	if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
-		resID = oid.Hex()
-	} else {
-		return c.JSON(http.StatusInternalServerError, "Not objectid.ObjectID, do what you want")
+		results := mc.Database("fe-concentration").Collection("concentration")
+		concData := ConcentrationData{
+			ConcentrationData: ca.ConcentrationData,
+		}
+		res, err := results.InsertOne(context.Background(), concData)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, "No Insert Conc")
+		}
+
+		if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
+			resID = oid.Hex()
+		} else {
+			return c.JSON(http.StatusInternalServerError, "Not objectid.ObjectID, do what you want")
+		}
 	}
 
 	db := sqlConnect()
