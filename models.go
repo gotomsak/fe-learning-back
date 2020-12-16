@@ -57,9 +57,9 @@ type AnswerResultSend struct {
 // User userテーブルのstruct
 type User struct {
 	gorm.Model
-	Username       string `json:"username"`
+	Username       string `json:"username" gorm:"size:255"`
 	Email          string `json:"email" gorm:"type:varchar(100);unique_index"`
-	PasswordDigest string `json:"password_digest"`
+	PasswordDigest string `json:"password_digest" gorm:"size:255"`
 }
 
 // UserSignup userのサインアップ時のstruct
@@ -86,27 +86,25 @@ type UserSend struct {
 // AnswerResult 解答の結果を保存するテーブルのstruct
 type AnswerResult struct {
 	gorm.Model
-	UserID           uint      `gorm:"not null"`
-	UserAnswer       string    `gorm:"not null"` // userの選んだ答え
-	AnswerResult     string    `gorm:"not null"` // correctかincorrect
-	MemoLog          string    `gorm:"type:text;"`
-	OtherFocusSecond uint      `json:"other_focus_second"`
-	QuestionID       uint      `gorm:"not null"`
-	StartTime        time.Time `json:"start_time"`
-	EndTime          time.Time `json:"end_time"`
+	UserID            uint   `gorm:"not null"`
+	UserAnswer        string `gorm:"not null"` // userの選んだ答え
+	AnswerResult      string `gorm:"not null"` // correctかincorrect
+	ConcentrationData string
+	MemoLog           string    `gorm:"type:text;"`
+	OtherFocusSecond  uint      `json:"other_focus_second"`
+	QuestionID        uint      `gorm:"not null"`
+	StartTime         time.Time `json:"start_time"`
+	EndTime           time.Time `json:"end_time"`
 }
 
 // AnswerResultSection 解答の結果のまとめを保存するテーブルのstruct
 type AnswerResultSection struct {
 	gorm.Model
-	UserID              uint   `json:"user_id" gorm:"not null"`
-	AnswerResultIDs     string `json:"answer_result_ids"`
-	CorrectAnswerNumber uint   `json:"correct_answer_number" gorm:"not null"`
-	OtherFocusSecond    uint   `json:"other_focus_second"`
-	// FaceVideoPath       string `gorm:"type:varchar(255);unique_index"`
-	FaceImagePath string    `json:"face_image_path" gorm:"not null"`
-	StartTime     time.Time `json:"start_time"`
-	EndTime       time.Time `json:"end_time"`
+	UserID              uint      `json:"user_id" gorm:"not null"`
+	AnswerResultIDs     string    `json:"answer_result_ids"`
+	CorrectAnswerNumber uint      `json:"correct_answer_number" gorm:"not null"`
+	StartTime           time.Time `json:"start_time"`
+	EndTime             time.Time `json:"end_time"`
 }
 
 // CheckAnswerSection sectionごとの問題が送信されてきた時のbindのstruct
@@ -116,20 +114,20 @@ type CheckAnswerSection struct {
 	AnswerResultIDs     []uint64 `json:"answer_result_ids" gorm:"type:text;not null"`
 	CorrectAnswerNumber uint     `json:"correct_answer_number" gorm:"not null"`
 	OtherFocusSecond    uint     `json:"other_focus_second"`
-	// FaceVideoPath       string `gorm:"type:varchar(255);unique_index"`
-	FaceImagePath string    `json:"face_image_path" gorm:"not null"`
-	Blink         []float64 `json:"blink"`
-	FaceMove      []float64 `json:"face_move"`
-	Angle         []float64 `json:"angle"`
-	W             []float64 `json:"w"`
-	C1            []float64 `json:"c1"`
-	C2            []float64 `json:"c2"`
-	C3            []float64 `json:"c3"`
-	Concentration []float64 `json:"concentration"`
-	Method1       bool      `json:"method1"`
-	Method2       bool      `json:"method2"`
-	StartTime     string    `json:"start_time"`
-	EndTime       string    `json:"end_time"`
+	StartTime           string   `json:"start_time"`
+	EndTime             string   `json:"end_time"`
+}
+
+// CheckAnswer postされてきたdataのbind
+type CheckAnswer struct {
+	UserID            uint          `json:"user_id"`
+	UserAnswer        string        `json:"user_answer"`
+	MemoLog           string        `json:"memo_log"`
+	OtherFocusSecond  uint          `json:"other_focus_second"`
+	QuestionID        uint          `json:"question_id"`
+	ConcentrationData []interface{} `json:"concentration_data"`
+	StartTime         string        `json:"start_time"`
+	EndTime           string        `json:"end_time"`
 }
 
 // Questionnaire アンケート結果を保存するテーブルのstruct
@@ -146,9 +144,7 @@ type Questionnaire struct {
 // Frequency 最高最低頻度
 type Frequency struct {
 	gorm.Model
-	UserID uint `gorm:"not null"`
-	// MaxFrequencyVideo    string  `gorm:"type:varchar(255);unique_index"`
-	// MinFrequencyVideo    string  `gorm:"type:varchar(255);unique_index"`
+	UserID               uint    `gorm:"not null"`
 	MaxBlinkFrequency    float64 `json:"max_blink_frequency"`
 	MinBlinkFrequency    float64 `json:"min_blink_frequency"`
 	MaxFaceMoveFrequency float64 `json:"max_face_move_frequency"`
@@ -160,17 +156,22 @@ type Frequency struct {
 }
 
 // ConcentrationData 集中度の保存
+// type ConcentrationData struct {
+// 	UserID                uint      `json:"user_id"`
+// 	AnswerResultSectionID uint      `json:"answer_result_section_id"`
+// 	FaceImagePath         string    `json:"face_image_path"`
+// 	Blink                 []float64 `json:"blink"`
+// 	FaceMove              []float64 `json:"face_move"`
+// 	Angle                 []float64 `json:"angle"`
+// 	W                     []float64 `json:"w"`
+// 	C1                    []float64 `json:"c1"`
+// 	C2                    []float64 `json:"c2"`
+// 	C3                    []float64 `json:"c3"`
+// }
+
+// ConcentrationData 集中度の保存
 type ConcentrationData struct {
-	UserID                uint      `json:"user_id"`
-	AnswerResultSectionID uint      `json:"answer_result_section_id"`
-	FaceImagePath         string    `json:"face_image_path"`
-	Blink                 []float64 `json:"blink"`
-	FaceMove              []float64 `json:"face_move"`
-	Angle                 []float64 `json:"angle"`
-	W                     []float64 `json:"w"`
-	C1                    []float64 `json:"c1"`
-	C2                    []float64 `json:"c2"`
-	C3                    []float64 `json:"c3"`
+	ConcentrationData []interface{} `json:"concentration_data"`
 }
 
 // SonConcentrationData 集中度の保存

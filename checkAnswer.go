@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func checkAnswer(c echo.Context) error {
@@ -17,31 +19,31 @@ func checkAnswer(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "401")
 	}
 
-	answerResult := AnswerResult{}
 	question := Question{}
+	ca := new(CheckAnswer)
+	if err = c.Bind(ca); err != nil {
+		return c.String(http.StatusInternalServerError, "The format is different")
+	}
+	fmt.Println("kusoga")
+	mc, ctx := mongoConnect()
+	defer mc.Disconnect(ctx)
 
-	startTime := c.FormValue("start_time")
-
-	endTime := c.FormValue("end_time")
-	fmt.Println(endTime)
-	otherFocusSecond := c.FormValue("other_focus_second")
-	uotherFocusSecond := stringToUint(otherFocusSecond)
-	questionID := c.FormValue("question_id")
-	uquestionID := stringToUint(questionID)
-	userID := c.FormValue("user_id")
-	uuserID := stringToUint(userID)
-	answerResult.UserAnswer = c.FormValue("user_answer")
-	answerResult.QuestionID = uquestionID
-	answerResult.MemoLog = c.FormValue("memo_log")
-	answerResult.StartTime = stringToTime(startTime)
-	answerResult.EndTime = stringToTime(endTime)
-	answerResult.OtherFocusSecond = uotherFocusSecond
-	answerResult.UserID = uuserID
+	results := mc.Database("fe-concentration").Collection("concentration")
+	concData := ConcentrationData{
+		ConcentrationData: ca.ConcentrationData,
+	}
+	res, err := results.InsertOne(context.Background(), concData)
+	var resID string
+	if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
+		resID = oid.Hex()
+	} else {
+		return c.JSON(http.StatusInternalServerError, "Not objectid.ObjectID, do what you want")
+	}
 
 	db := sqlConnect()
 	defer db.Close()
 
-	db.First(&question, questionID)
+	db.First(&question, ca.QuestionID)
 	result := "incorrect"
 	var answer string
 	if question.AimgPath != "" {
@@ -50,10 +52,20 @@ func checkAnswer(c echo.Context) error {
 		answer = question.Ans
 	}
 
-	if question.AimgPath == answerResult.UserAnswer || question.Ans == answerResult.UserAnswer {
+	if question.AimgPath == ca.UserAnswer || question.Ans == ca.UserAnswer {
 		result = "correct"
 	}
-	answerResult.AnswerResult = result
+	answerResult := AnswerResult{
+		UserID:            ca.UserID,
+		UserAnswer:        ca.UserAnswer,
+		AnswerResult:      result,
+		ConcentrationData: resID,
+		MemoLog:           ca.MemoLog,
+		OtherFocusSecond:  ca.OtherFocusSecond,
+		QuestionID:        ca.QuestionID,
+		StartTime:         stringToTime(ca.StartTime),
+		EndTime:           stringToTime(ca.EndTime),
+	}
 
 	if c.FormValue("test") == "true" {
 		tx := db.Begin()
