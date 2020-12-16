@@ -134,9 +134,9 @@ type Questionnaire struct {
 	AnswerResultSectionID uint `json:"answer_result_section_id"`
 	UserID                uint `json:"user_id" gorm:"not null"`
 	Concentration         int  `json:"concentration"` // 集中
-	WhileDoing            bool `json:"while_doing"`   // しながら
-	Cheating              bool `json:"cheating"`      // カンニング
-	Nonsense              bool `json:"nonsense"`      // デタラメ
+	WhileDoing            int  `json:"while_doing"`   // しながら
+	Cheating              int  `json:"cheating"`      // カンニング
+	Nonsense              int  `json:"nonsense"`      // デタラメ
 }
 
 // Frequency 最高最低頻度
