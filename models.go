@@ -184,3 +184,20 @@ type SonConcentrationData struct {
 type Results struct {
 	ResultIDs []uint64 `json:"answer_result_ids"`
 }
+
+type GetQuestionGymBind struct {
+	NowLevel int `json:"now_level"`
+}
+type GetQuestionGymRes struct {
+	QuestionID uint     `json:"question_id"`
+	Question   string   `json:"question"`
+	AnsList    []string `json:"ans_list"`
+}
+type QuestionsSub struct {
+	ID       uint   `json:"id"`
+	Question string `json:"question"`
+	Mistake1 string `json:"mistake1"`
+	Mistake2 string `json:"mistake2"`
+	Mistake3 string `json:"mistake3"`
+	Ans      string `json:"ans"`
+}

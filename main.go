@@ -37,6 +37,7 @@ func router() *echo.Echo {
 	e.POST("/init_min_frequency", initMinFrequency)
 	e.GET("/signout", signout)
 	e.GET("/check_session", checkSession)
+	e.POST("/question_gym", getQuestionGym)
 	return e
 }
 
